@@ -1,2 +1,2 @@
 all:
-	gcc -o vice vice.c 
+	gcc -o teri teri.c 

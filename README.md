@@ -18,8 +18,16 @@ So, the board starts at tile 21, with each row having invalid squares at *x*0 an
 
 ![pic of board](https://i.imgur.com/JzCLfMQ.png)
 
-# Accounting for Strange Rules
+# Accounting for Rules
 
-**Fifty Moves Rule** - This the rule that if we haven't had a capture or a pawn move for 50 moves, the game is a draw. 
+**Fifty Moves Rule** - This the rule that if we haven't had a capture or a pawn move for 50 moves, the game is a draw. (We will need a counter variable for this) 
 
-**3x Rep Rule** - If there is a threefold repetition, the game is a rule
+**3x Rep Rule** - If there is a threefold repetition, the game is ruled a draw. (We will need some kind of key, defining a unique value, to detect this)
+
+**En Passant** - Check if any En Passant captures are avaialable (need something to track this).
+
+**Side to Move** - Track which side to move.
+
+**Ply** - Amount of half moves made in a game (if one side has made a move, that is one ply. If two sides have a made a move (counted as a *move*) then we are two plys deep.) (need to track this value aswell).
+
+
