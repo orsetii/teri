@@ -6,10 +6,17 @@
 
 
 
+
 int main(int argc, char** argv) {
 
-	u64 test_bitboard = 0ULL;
-	test_bitboard |= (1ULL << SQ264(A2));
+	teri_init();
+
+
+	u64 test_bitboard = 5ULL;
 	printBitBoard(test_bitboard);
+	S_BOARD board;
+	resetBoard(&board);
+
+
 	return 0;
 }

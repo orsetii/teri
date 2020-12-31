@@ -29,7 +29,7 @@ enum { RANK_1, RANK_2,RANK_3,RANK_4,RANK_5,RANK_6,RANK_7,RANK_8,RANK_NONE };
 enum { WHITE, BLACK, BOTH };
 
 // constants for all 64 valid squares.
-// Also has the 'NO_SQ' for invalid squares.
+// Also has the 'OFF_BOARD' for invalid squares.
 // This provides an int value for each square.
 enum {
 	A1 = 21, B1, C1, D1, E1, F1, G1, H1,
@@ -39,7 +39,7 @@ enum {
 	A5 = 61, B5, C5, D5, E5, F5, G5, H5, 
 	A6 = 71, B6, C6, D6, E6, F6, G6, H6, 
 	A7 = 81, B7, C7, D7, E7, F7, G7, H7, 
-	A8 = 91, B8, C8, D8, E8, F8, G8, H8, NO_SQ
+	A8 = 91, B8, C8, D8, E8, F8, G8, H8, NO_SQ, OFF_BOARD = -1
 };
 
 enum { FALSE, TRUE };
@@ -90,7 +90,7 @@ typedef struct {
 	// side holds the current side to move
 	int side;
 	
-	// En Passant square, if one is active. If not, this will be 'NO_SQ'
+	// En Passant square, if one is active. If not, this will be 'OFF_BOARD'
 	int enPas;
 
 	// The counter for fifty moves, we are counting in plys or half moves, so this will have to equal 100, not 50.
@@ -138,6 +138,10 @@ typedef struct {
 // This macro, when given the File (F) and Rank (R) number, returns the 120-array-based index.
 #define FR2SQ(f, r) ( (21 + (f) ) + ( (r) * 10) )
 #define SQ264(n) (board_120[n])
+#define POP(b) PopBit(b)
+#define CNT(b) CountBits(b)
+#define CLRBIT(bb, sq) ((bb) &= ClearMask[(sq)])
+#define SETBIT(bb, sq) ((bb) |= SetMask[(sq)])
  
 /* GLOBALS */
 
@@ -169,17 +173,30 @@ static const int board_64[] = {
 	81, 82, 83, 84, 85, 86, 87, 88, 
 	91, 92, 93, 94, 95, 96, 97, 98,
 };
+
+extern u64 SetMask[64];
+extern u64 ClearMask[64];
+
+extern u64 PieceKeys[13][120];
+extern u64 SideKey;
+extern u64 CastleKeys[16];
  
 /* FUNCTIONS */
 
 // bitboards.c
 void printBitBoard(u64 board);
+int PopBit(u64 *bb);
+int countBits(u64 board);
+u64 xorFR(u64 to_pop, u64 board);
+
+// init.c
+extern void teri_init();
  
+// hashkeys.c
+u64 generatePositionKey(const S_BOARD *pos);
  
- 
- 
- 
- 
+// board.c
+void resetBoard(S_BOARD *pos);
 
 
 

@@ -1,2 +1,6 @@
+
+CFLAGS=-g -o teri
+SOURCE_FILES=teri.c bitboards.c init.c hashkeys.c board.c
+
 all:
-	gcc -g teri.c bitboards.c -o teri
+	gcc $(SOURCE_FILES) $(CFLAGS) 

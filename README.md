@@ -31,3 +31,5 @@ So, the board starts at tile 21, with each row having invalid squares at *x*0 an
 **Ply** - Amount of half moves made in a game (if one side has made a move, that is one ply. If two sides have a made a move (counted as a *move*) then we are two plys deep.) (need to track this value aswell).
 
 
+
+
