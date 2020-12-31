@@ -2,6 +2,9 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#include <stdlib.h>
+
+
 typedef unsigned long long u64;
 
 // Name and version of current program
@@ -11,6 +14,8 @@ typedef unsigned long long u64;
 
 // Max number of moves we would expect in a game (this is 2048 half-moves).
 #define MAXGAMEMOVES 2048
+
+
 
 
 // enumerated constants of pieces
@@ -49,6 +54,23 @@ enum { FALSE, TRUE };
 // You will not be able to castle if rook or king is moved (i think)
 // So, we can simply just NOT a castling perm in that scenario.
 enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
+
+// Information needed to undo a move
+typedef struct {
+
+	// A move, stored as an integer.
+	int move;
+	// Castle Permission, before that move was played.
+	int castlePerm;
+	// En Passant Square before move was played.
+	int enPas;
+	// Fifty Move Count Status
+	int fiftyMovCnt;
+	// Position Key, to define board state in positions
+	u64 positionKey;
+
+
+} S_UNDO;
 
 // S_BOARD is the structure defining the board
 typedef struct {
@@ -95,16 +117,63 @@ typedef struct {
 	int MajPieces[3];
 	// Minor Pieces are Bishops and Knights
 	int MinPieces[3];
+
+	// Now we should be able to undo the entire way back through each half move.
+	S_UNDO history[MAXGAMEMOVES];
 	
+	// Piece List
+	// 13 pieces, of which you can have at MOST 10 of, on the board (would be done via pawn promotions)
+	int pieceList[13][10];
+
+	// If we wanted to put the first White Knight on E1, we would do:
+	// pieceList[wN][0] = E1;
 
 
 	
 
 } S_BOARD;
- 
- 
- 
 
+/* MACROS */
+
+// This macro, when given the File (F) and Rank (R) number, returns the 120-array-based index.
+#define FR2SQ(f, r) ( (21 + (f) ) + ( (r) * 10) )
+#define SQ264(n) (board_120[n])
+ 
+/* GLOBALS */
+
+// board_120 contains square coords(kinda) for all 120 squares. All '-1' squares are invalid squares.
+static const int board_120[] = {
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1,  0,  1,  2,  3,  4,  5,  6,  7, -1, 
+	-1,  8,  9, 10, 11, 12, 13, 14, 15, -1, 
+	-1, 16, 17, 18, 19, 20, 21, 22, 23, -1, 
+	-1, 24, 25, 26, 27, 28, 29, 30, 31, -1, 
+	-1, 32, 33, 34, 35, 36, 37, 38, 39, -1, 
+	-1, 40, 41, 42, 43, 44, 45, 46, 47, -1, 
+	-1, 48, 49, 50, 51, 52, 53, 54, 55, -1, 
+	-1, 56, 57, 58, 59, 60, 61, 62, 63, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+};
+
+
+// board_64 contains the 64-square based array, with only the valid squares; containing ints ranging from 21-98.
+static const int board_64[] = {
+	21, 22, 23, 24, 25, 26, 27, 28, 
+	31, 32, 33, 34, 35, 36, 37, 38, 
+	41, 42, 43, 44, 45, 46, 47, 48, 
+	51, 52, 53, 54, 55, 56, 57, 58, 
+	61, 62, 63, 64, 65, 66, 67, 68, 
+	71, 72, 73, 74, 75, 76, 77, 78, 
+	81, 82, 83, 84, 85, 86, 87, 88, 
+	91, 92, 93, 94, 95, 96, 97, 98,
+};
+ 
+/* FUNCTIONS */
+
+// bitboards.c
+void printBitBoard(u64 board);
  
  
  

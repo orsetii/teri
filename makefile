@@ -1,2 +1,2 @@
 all:
-	gcc -o teri teri.c 
+	gcc -g teri.c bitboards.c -o teri
