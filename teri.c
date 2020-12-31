@@ -15,7 +15,9 @@ int main(int argc, char** argv) {
 	u64 test_bitboard = 5ULL;
 	printBitBoard(test_bitboard);
 	S_BOARD board;
+	printf("\n\n");
 	resetBoard(&board);
+	printBitBoard(board.pawns[2]);
 
 
 	return 0;
