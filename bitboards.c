@@ -20,7 +20,7 @@ int PopBit(u64 *bb) {
 
 void printBitBoard(u64 board) {
 	u64 shift = 1ULL;
-	printf("Total Bits: %d\n", countBits(board));
+	printf("Total Bits: %d\n", CountBits(board));
 	for (int rank = RANK_8; rank >= RANK_1; --rank) {
 		for (int file = FILE_A; file <= FILE_H; ++file) {
 			int sq = FR2SQ(file, rank); // 120 based
@@ -40,7 +40,7 @@ void printBitBoard(u64 board) {
 
 }
 
-int countBits(u64 board) {
+int CountBits(u64 board) {
 	int total;
 	for (total = 0; board; ++total, board &= board - 1);
 	return total;

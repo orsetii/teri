@@ -3,6 +3,8 @@
 #define DEFS_H
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 
 
 typedef unsigned long long u64;
@@ -14,6 +16,15 @@ typedef unsigned long long u64;
 
 // Max number of moves we would expect in a game (this is 2048 half-moves).
 #define MAXGAMEMOVES 2048
+
+// The first part is the description of pieces on the board
+// with numbers being the number of consecutive empty pieces in a row
+// followed by either 'w' or 'b' for which side to move,
+// then castling permissions
+// then notation for an En Passant Square if available, if not it is simply '-'
+// Then fifty move count
+// Then total moves (a move being counted as both black and white have moved)
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 
 
@@ -69,7 +80,6 @@ typedef struct {
 	// Position Key, to define board state in positions
 	u64 positionKey;
 
-
 } S_UNDO;
 
 // S_BOARD is the structure defining the board
@@ -107,16 +117,19 @@ typedef struct {
 	// a unique key generated for each position.
 	u64 positionKey;
 
-	// This is a key used to define what piece is what. There are 12 possible pieces, as we are including the black and white variants.
+	// This is a key used to define how many pieces are on the board of a type. There are 12 possible pieces, as we are including the black and white variants.
 	int pieceNum[13];
 
 	// The 3 below arrays all have 3 ints, for white, black and for both.
 	// Big Pieces are any piece that is NOT a pawn.
-	int bigPieces[3];
-	// Major Pieces are Rooks and Queens
-	int MajPieces[3];
+	int BigPieces[2];
+	// Major Pieces are Rooks and Queens and Kings
+	int MajPieces[2];
 	// Minor Pieces are Bishops and Knights
-	int MinPieces[3];
+	int MinPieces[2];
+
+	// Holds the material score, for white and black.
+	int material[2];
 
 	// Now we should be able to undo the entire way back through each half move.
 	S_UNDO history[MAXGAMEMOVES];
@@ -138,6 +151,7 @@ typedef struct {
 // This macro, when given the File (F) and Rank (R) number, returns the 120-array-based index.
 #define FR2SQ(f, r) ( (21 + (f) ) + ( (r) * 10) )
 #define SQ264(n) (board_120[n])
+#define SQ120(n) (board_64[(n)])
 #define POP(b) PopBit(b)
 #define CNT(b) CountBits(b)
 #define CLRBIT(bb, sq) ((bb) &= ClearMask[(sq)])
@@ -181,23 +195,42 @@ extern u64 PieceKeys[13][120];
 extern u64 SideKey;
 extern u64 CastleKeys[16];
  
+extern char PceChar[];
+extern char SideChar[];
+extern char RankChar[];
+extern char FileChar[];
+
+extern int PieceBig[13];
+// Major Pieces are Rooks and Queens
+extern int PieceMaj[13];
+extern int PieceMin[13];
+extern int PieceVal[13];
+extern int PieceCol[13];
+
+extern int FilesBrd[BRD_SQ_NUM];
+extern int RanksBrd[BRD_SQ_NUM];
+
+
+
 /* FUNCTIONS */
 
 // bitboards.c
 void printBitBoard(u64 board);
 int PopBit(u64 *bb);
-int countBits(u64 board);
+int CountBits(u64 board);
 u64 xorFR(u64 to_pop, u64 board);
 
 // init.c
 extern void teri_init();
  
 // hashkeys.c
-u64 generatePositionKey(const S_BOARD *pos);
+extern u64 generatePositionKey(const S_BOARD *pos);
  
 // board.c
-void resetBoard(S_BOARD *pos);
-
-
+extern void resetBoard(S_BOARD *pos);
+extern int parseFen(char* fen, S_BOARD *pos);
+extern void printBoard(const S_BOARD *pos);
+extern void UpdateListsMaterial(S_BOARD *pos);
+extern int CheckBoard(const S_BOARD *pos);
 
 #endif
