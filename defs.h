@@ -66,6 +66,28 @@ enum { FALSE, TRUE };
 // So, we can simply just NOT a castling perm in that scenario.
 enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 
+
+typedef struct {
+
+	// The 'move' int stores all the information we need for a move.
+	int move;
+	int score;
+
+
+
+
+
+} S_MOVE;
+
+
+
+
+
+
+
+
+
+
 // Information needed to undo a move
 typedef struct {
 
@@ -146,17 +168,78 @@ typedef struct {
 
 } S_BOARD;
 
+/* GAME MOVE */
+
+/*
+ * We store the move in a binary representation
+ * The next four bits, store what a pawn was promoted to, if a pawn was promoted. If there wasn't a promotion,
+ * these will all be set to 0.
+ * The last bit will store whether the move was a castling move or not.
+ *
+ * 0000 0000 0000 0000 0000 0000
+ *                      ^^^ ^^^^                     
+ * 	         	 From Square
+ *
+ * The least significant 7 bits store the 'From' square.
+ *
+ *
+ * 0000 0000 0000 0000 0--- ----
+ *             ^^ ^^^^ ^
+ *                 To Square
+ *
+ * The next least significant 7 bits store the 'To' Square
+ *                
+ *
+ * 0000 0000 00-- ---- ---- ----
+ *        ^^ ^^
+ *        What Piece, if any, was captured. 
+ * 	  We have 12 possible pieces, so we can store all of that in 4 bits.
+ *
+ * 0000 00-- ---- ---- ---- ----
+ *	 ^
+ *	Was the move an En Passant Capture or not?
+ *
+ *
+ *
+ *
+ *
+ * 0000 0--- ---- ---- ---- ----
+ *  ^^^ ^
+ *    If a pawn promoted, what piece did it promote to?
+ *    If nothing promoted, all bits are set to 0.
+ *
+ *    4 bits correspond to: Bishop - Rook - Queen - Knight
+ *
+ * 0--- ---- ---- ---- ---- ----
+ * ^
+ * Was the move a castling move?
+ * If so, this bit should be set.
+ *
+ *
+ *
+ *
+ */
+
 /* MACROS */
 
 // This macro, when given the File (F) and Rank (R) number, returns the 120-array-based index.
 #define FR2SQ(f, r) ( (21 + (f) ) + ( (r) * 10) )
 #define SQ264(n) (board_120[n])
 #define SQ120(n) (board_64[(n)])
+
+
 #define POP(b) PopBit(b)
 #define CNT(b) CountBits(b)
 #define CLRBIT(bb, sq) ((bb) &= ClearMask[(sq)])
 #define SETBIT(bb, sq) ((bb) |= SetMask[(sq)])
- 
+
+// The below 4 macros allow us to easily ask if a piece is of X type.
+#define IsBQ(p) (PieceBishopQueen[(p)])
+#define IsRQ(p) (PieceRookQueen[(p)])
+#define IsKn(p) (PieceKnight[(p)])
+#define IsKi(p) (PieceKing[(p)])
+
+
 /* GLOBALS */
 
 // board_120 contains square coords(kinda) for all 120 squares. All '-1' squares are invalid squares.
@@ -210,6 +293,11 @@ extern int PieceCol[13];
 extern int FilesBrd[BRD_SQ_NUM];
 extern int RanksBrd[BRD_SQ_NUM];
 
+// Is a piece an X? These arrays are defined to help with answering these questions.
+extern int PieceKnight[13];
+extern int PieceKing[13];
+extern int PieceRookQueen[13];
+extern int PieceBishopQueen[13];
 
 
 /* FUNCTIONS */
@@ -232,5 +320,13 @@ extern int parseFen(char* fen, S_BOARD *pos);
 extern void printBoard(const S_BOARD *pos);
 extern void UpdateListsMaterial(S_BOARD *pos);
 extern int CheckBoard(const S_BOARD *pos);
+
+// attack.c
+extern int SqAttacked(const int sq, const int side, const S_BOARD *pos);
+
+// visual.c
+extern void ShowSqAtBySide(const int side, const S_BOARD *pos);
+
+
 
 #endif
