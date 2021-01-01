@@ -1,10 +1,7 @@
 #include "defs.h"
 
 
-// In the u64 interpretation of the board (bitBoard), we can easily define a bit at a position by taking for example, we want to define square A2 as 1. We know A2 is the 8th piece, so we can do 1 >> 8, and we have set A2 to 1.
-
-
-
+#include "defs.h"
 #define FEN1 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 #define FEN2 "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
 #define FEN3 "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
@@ -13,28 +10,6 @@
 
 
 
-void ShowSqAtBySide(const int side, const S_BOARD *pos) {
-		
-	int rank = 0;
-	int file = 0;
-	int sq = 0;
-	
-	printf("\n\nSquares attacked by:%c\n",SideChar[side]);
-	for(rank = RANK_8; rank >= RANK_1; --rank) {
-		for(file = FILE_A; file <= FILE_H; ++file) {
-			sq = FR2SQ(file,rank);
-			if(SqAttacked(sq,side,pos)==TRUE) {
-				printf("X");
-			} else {
-				printf("-");
-			}
-				
-		}
-		printf("\n");
-	}  
-    printf("\n\n");
-
-}
 
 
 void test_FENS(S_BOARD *board) {
@@ -58,16 +33,21 @@ int main(int argc, char** argv) {
 	S_BOARD board[1];
 
 
-	parseFen(FEN_QUEEN_1v1 , board);
-	printBoard(board);
-
-	printf("\n\nWhite Attacking:\n");
-	ShowSqAtBySide(WHITE,board);
+	int move = 0;
+	int from = A2; int to = H7;
+	int cap = wR; int prom = bK;
 	
-	printf("\n\nBlack Attacking:\n");
-	ShowSqAtBySide(BLACK,board);
-
-	assert(CheckBoard(board));
+	move = ( ( from ) | ( to << 7 ) | ( cap << 14 ) | ( prom << 20) );
+			
+	printf("from:%d to:%d cap:%d prom:%d\n",
+		FROMSQ(move),TOSQ(move),CAPTURED(move),
+		PROMOTED(move));
+	
+	printf("Algebraic from:%s\n",PrintSq(from));
+	printf("Algebraic to:%s\n",PrintSq(to));
+	printf("Algebraic move:%s\n",PrintMove(move));
+	
+	//assert(CheckBoard(board));
 
 
 

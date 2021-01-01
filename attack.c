@@ -19,6 +19,11 @@ const int KiDir[8] = { -1, -10, 1, 10, -9, -11, 11, 9 };
 // pos is a pointer to the boardstate
 int SqAttacked(const int sq, const int side, const S_BOARD *pos) {
 
+	assert(SqOnBoard(sq));
+	assert(SideValid(side));
+	assert(CheckBoard(pos));
+	
+
 	int piece,t_sq,dir;
 	
 	// Checking for Pawn Attacks

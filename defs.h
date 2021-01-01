@@ -16,6 +16,8 @@ typedef unsigned long long u64;
 
 // Max number of moves we would expect in a game (this is 2048 half-moves).
 #define MAXGAMEMOVES 2048
+// Max number of moves we would expect in a given position.
+#define MAXPOSITIONMOVES 256
 
 // The first part is the description of pieces on the board
 // with numbers being the number of consecutive empty pieces in a row
@@ -68,17 +70,16 @@ enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 
 
 typedef struct {
-
 	// The 'move' int stores all the information we need for a move.
 	int move;
 	int score;
-
-
-
-
-
 } S_MOVE;
 
+typedef struct {
+	S_MOVE moves[MAXPOSITIONMOVES];
+	// A count of how many moves on the movelist
+	int count;
+} S_MOVELIST;
 
 
 
@@ -176,49 +177,91 @@ typedef struct {
  * these will all be set to 0.
  * The last bit will store whether the move was a castling move or not.
  *
- * 0000 0000 0000 0000 0000 0000
- *                      ^^^ ^^^^                     
- * 	         	 From Square
+ * 0000 0000 0000 0000 0000 0111 1111
+ *                           ^^^ ^^^^                     
+ * 	         	    From Square
  *
  * The least significant 7 bits store the 'From' square.
  *
+ * To Get: 0x7F
  *
- * 0000 0000 0000 0000 0--- ----
- *             ^^ ^^^^ ^
+ *
+ * 0000 0000 0000 0011 1111 1--- ----
+ *                  ^^ ^^^^ ^
  *                 To Square
  *
  * The next least significant 7 bits store the 'To' Square
+ *
+ * To Get: >> 7, 0x7F
  *                
  *
- * 0000 0000 00-- ---- ---- ----
- *        ^^ ^^
+ * 0000 0000 0011 11-- ---- ---- ----
+ *             ^^ ^^
  *        What Piece, if any, was captured. 
  * 	  We have 12 possible pieces, so we can store all of that in 4 bits.
  *
- * 0000 00-- ---- ---- ---- ----
- *	 ^
+ * To Get: >> 14, 0xF
+ *
+ * 0000 0000 01-- ---- ---- ---- ----
+ *	      ^
  *	Was the move an En Passant Capture or not?
  *
+ * To Get: 0x40000
  *
  *
+ * 0000 0000 1-- ---- ---- ---- ----
+ *           ^
+ *      Was the move a pawn start?
+ *      If so, this bit should be set.
+ *
+ * To Get: 0x80000
  *
  *
- * 0000 0--- ---- ---- ---- ----
- *  ^^^ ^
+ * 0000 1111 ---- ---- ---- ---- ----
+ *      ^^^^ 
  *    If a pawn promoted, what piece did it promote to?
  *    If nothing promoted, all bits are set to 0.
  *
  *    4 bits correspond to: Bishop - Rook - Queen - Knight
  *
- * 0--- ---- ---- ---- ---- ----
- * ^
+ * To Get: >> 20, 0xF
+ *
+ *
+ * 0001 ---- ---- ---- ---- ---- ----
+ *    ^
  * Was the move a castling move?
  * If so, this bit should be set.
+ *
+ * The last three bits should never be set.
+ *
+ * To Get: 0x1000000
  *
  *
  *
  *
  */
+
+// Macro to extract From Square in binary
+#define FROMSQ(m) ((m) & 0x7F)
+// Extract To Square in binary
+#define TOSQ(m) (((m) >> 7) & 0x7F)
+// Extract Captured Piece, as 4 bits.
+#define CAPTURED(m) (((m) >> 14) & 0xF)
+// Extract what a pawn was promoted to (if it has)
+#define PROMOTED(m) (((m) >> 20) & 0xF)
+
+// Flag if En Passant Move Occurred
+#define MFLAGEP 0x40000
+// Flag if Pawn Start Move Ocurred
+#define MFLAGPS 0x80000
+// Flag if Castling Move Ocurred
+#define MFLAGCA 0x1000000
+
+// Flag to extract if a capture occurred
+#define MFLAGCAP 0x7C000
+// Flag to extract if a promotion ocurred.
+#define MFLAGPROM 0xF00000
+
 
 /* MACROS */
 
@@ -327,6 +370,17 @@ extern int SqAttacked(const int sq, const int side, const S_BOARD *pos);
 // visual.c
 extern void ShowSqAtBySide(const int side, const S_BOARD *pos);
 
+
+// io.c
+extern char* PrintSq(const int sq);
+extern char* PrintMove(const int move);
+
+// validate.c
+extern int SqOnBoard(const int sq);
+extern int SideValid(const int side);
+extern int FileRankValid(const int fr);
+extern int PieceValidEmpty(const int pce);
+extern int PieceValid(const int pce);
 
 
 #endif
