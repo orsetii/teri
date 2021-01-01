@@ -1,6 +1,10 @@
 #include "defs.h"
 
 
+
+
+
+
 char* PrintSq(const int sq) {
 
 
@@ -46,6 +50,24 @@ char* PrintMove(const int move) {
 	}
 	
 	return MvStr;
+}
+
+void PrintMoveList(const S_MOVELIST *list) {
+
+	printf("MoveList:\n");
+
+
+	for (int i = 0; i < list->count; ++i) {
+
+		int move = list->moves[i].move;
+		int score = list->moves[i].score;
+		printf("Move %d: %s (score: %d)\n", i+1, PrintMove(move), score);
+	}
+	printf("MoveList Total %d Moves.\n\n", list->count);
+
+
+
+
 }
 
 

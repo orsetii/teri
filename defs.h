@@ -2,6 +2,11 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+// TO DISABLE ASSERT CALLS, UNCOMMENT THE BELOW LINE
+//#define NDEBUG
+
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -164,7 +169,6 @@ typedef struct {
 	// If we wanted to put the first White Knight on E1, we would do:
 	// pieceList[wN][0] = E1;
 
-
 	
 
 } S_BOARD;
@@ -206,7 +210,7 @@ typedef struct {
  *	      ^
  *	Was the move an En Passant Capture or not?
  *
- * To Get: 0x40000
+ * To Get: 0x40000pce
  *
  *
  * 0000 0000 1-- ---- ---- ---- ----
@@ -265,6 +269,7 @@ typedef struct {
 
 /* MACROS */
 
+
 // This macro, when given the File (F) and Rank (R) number, returns the 120-array-based index.
 #define FR2SQ(f, r) ( (21 + (f) ) + ( (r) * 10) )
 #define SQ264(n) (board_120[n])
@@ -281,6 +286,22 @@ typedef struct {
 #define IsRQ(p) (PieceRookQueen[(p)])
 #define IsKn(p) (PieceKnight[(p)])
 #define IsKi(p) (PieceKing[(p)])
+
+// SQOFFBOARD is a simple macro that checks a square to see if it is off-board, returning TRUE if it is.
+#define SQOFFBOARD(sq) (FilesBrd[sq] == OFF_BOARD)
+
+// The below macros define a sq value for the given one in a certain direction
+// Note the directions are for the perspective of viewing the board with rank 1 closest to you
+// and file A on the left
+#define SQ_ABOVE(sq) (SQOFFBOARD(sq+10) ? sq : sq+10)
+#define SQ_BELOW(sq) (SQOFFBOARD(sq-10) ? sq : sq-10)
+#define SQ_LEFT(sq) (SQOFFBOARD(sq-1) ? sq : sq-1)
+#define SQ_RIGHT(sq) (SQOFFBOARD(sq+1) ? sq : sq+1)
+#define SQ_LEFT_ABOVE(sq) (SQOFFBOARD(sq+9) ? sq : sq+9)
+#define SQ_RIGHT_ABOVE(sq) (SQOFFBOARD(sq+11) ? sq : sq+11)
+#define SQ_LEFT_BELOW(sq) (SQOFFBOARD(sq-9) ? sq : sq-9)
+#define SQ_RIGHT_BELOW(sq) (SQOFFBOARD(sq-11) ? sq : sq-11)
+
 
 
 /* GLOBALS */
@@ -321,7 +342,7 @@ extern u64 PieceKeys[13][120];
 extern u64 SideKey;
 extern u64 CastleKeys[16];
  
-extern char PceChar[];
+extern char PieceChar[];
 extern char SideChar[];
 extern char RankChar[];
 extern char FileChar[];
@@ -341,6 +362,7 @@ extern int PieceKnight[13];
 extern int PieceKing[13];
 extern int PieceRookQueen[13];
 extern int PieceBishopQueen[13];
+extern int PieceSlides[13];
 
 
 /* FUNCTIONS */
@@ -374,6 +396,7 @@ extern void ShowSqAtBySide(const int side, const S_BOARD *pos);
 // io.c
 extern char* PrintSq(const int sq);
 extern char* PrintMove(const int move);
+extern void PrintMoveList(const S_MOVELIST *list);
 
 // validate.c
 extern int SqOnBoard(const int sq);
@@ -382,5 +405,7 @@ extern int FileRankValid(const int fr);
 extern int PieceValidEmpty(const int pce);
 extern int PieceValid(const int pce);
 
+// movegen.c
+extern void GenerateAllMoves(const S_BOARD *pos, S_MOVELIST *list);
 
 #endif

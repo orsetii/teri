@@ -2,7 +2,7 @@
 
 - Add verbose flag, with debug print, with verbose flag check in the debug print
 
-- 
+- Web GUI: http://talkchess.com/forum3/viewtopic.php?t=75352
 
 
 

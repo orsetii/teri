@@ -306,10 +306,11 @@ void resetBoard(S_BOARD *pos) {
 		if (board_120[i] != -1) pos->pieces[i] = EMPTY;
 		// Reset Piece Numbers
 		// We do one loop for WHITE, for BLACK and for BOTH.
-		if (i < 3) {
+		if (i < 2) {
 			pos->BigPieces[i] = 0;
 			pos->MajPieces[i] = 0;
 			pos->MinPieces[i] = 0;
+			pos->material[i] = 0;
 			pos->pawns[i]  = 0ULL;
 		}
 		if (i < 13) {
@@ -373,7 +374,7 @@ void printBoard(const S_BOARD *pos) {
 		for (file = FILE_A; file <= FILE_H; file++) {
 			sq = FR2SQ(file, rank);
 			piece = pos->pieces[sq];
-			printf("%3c", PceChar[piece]);
+			printf("%3c", PieceChar[piece]);
 		}
 		printf("\n");
 	}

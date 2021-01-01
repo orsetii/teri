@@ -1,7 +1,7 @@
 #include "defs.h"
 
 // Char for each piece, with a '.' representing EMPTY.
-char PceChar[] = ".PNBRQKpnbrqk";
+char PieceChar[] = ".PNBRQKpnbrqk";
 // Char for which side, with '-' representing BOTH.
 char SideChar[] = "wb-";
 // Char for each rank, 1-8.
@@ -36,4 +36,5 @@ int PieceKing[13] = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FAL
 int PieceRookQueen[13] = { FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE };
 
 int PieceBishopQueen[13] = { FALSE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE };
+int PieceSlides[13] = { FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, FALSE };
 
