@@ -1,4 +1,4 @@
-// vice.c
+// teri.c
 
 #include "stdio.h"
 #include "defs.h"
@@ -15,7 +15,7 @@ int main() {
 	S_MOVELIST list[1];
 	
 	ParseFen(PERFTFEN,board);
-	PerftTest(4,board);
+	PerftTest(5,board);
 	
 	return 0;
 }
