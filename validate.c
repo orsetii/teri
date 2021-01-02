@@ -1,8 +1,9 @@
+// validate.c
+
 #include "defs.h"
 
-
 int SqOnBoard(const int sq) {
-	return FilesBrd[sq]==OFF_BOARD ? 0 : 1;
+	return FilesBrd[sq]==OFFBOARD ? 0 : 1;
 }
 
 int SideValid(const int side) {

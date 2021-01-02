@@ -1,28 +1,24 @@
+// io.c
+
+#include "stdio.h"
 #include "defs.h"
 
-
-
-
-
-
-char* PrintSq(const int sq) {
-
+char *PrSq(const int sq) {
 
 	static char SqStr[3];
-
+	
 	int file = FilesBrd[sq];
 	int rank = RanksBrd[sq];
-
-	sprintf(SqStr, "%c%c", file+'a', rank + '1');
-
-
-
-
+	
+	
+	
+	sprintf(SqStr, "%c%c", ('a'+file), ('1'+rank));
+	
 	return SqStr;
+
 }
 
-
-char* PrintMove(const int move) {
+char *PrMove(const int move) {
 
 	static char MvStr[6];
 	
@@ -34,8 +30,6 @@ char* PrintMove(const int move) {
 	int promoted = PROMOTED(move);
 	
 	if(promoted) {
-		// We nicely default to queen here, so say a wP tries to change into a bK, it wont match any
-		// if's and will become a wQ.
 		char pchar = 'q';
 		if(IsKn(promoted)) {
 			pchar = 'n';
@@ -53,22 +47,29 @@ char* PrintMove(const int move) {
 }
 
 void PrintMoveList(const S_MOVELIST *list) {
-
-	printf("MoveList:\n");
-
-
-	for (int i = 0; i < list->count; ++i) {
-
-		int move = list->moves[i].move;
-		int score = list->moves[i].score;
-		printf("Move %d: %s (score: %d)\n", i+1, PrintMove(move), score);
+	int index = 0;
+	int score = 0;
+	int move = 0;
+	printf("MoveList:\n",list->count);
+	
+	for(index = 0; index < list->count; ++index) {
+	
+		move = list->moves[index].move;
+		score = list->moves[index].score;
+		
+		printf("Move:%d > %s (score:%d)\n",index+1,PrMove(move),score);
 	}
-	printf("MoveList Total %d Moves.\n\n", list->count);
-
-
-
-
+	printf("MoveList Total %d Moves:\n\n",list->count);
 }
+
+
+
+
+
+
+
+
+
 
 
 

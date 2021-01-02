@@ -1,6 +1,2 @@
-
-CFLAGS=-g -o teri
-SOURCE_FILES=teri.c bitboards.c init.c hashkeys.c board.c data.c attack.c io.c visual.c movegen.c validate.c makemove.c
-
 all:
-	gcc $(SOURCE_FILES) $(CFLAGS) 
+	gcc vice.c init.c bitboards.c hashkeys.c board.c data.c attack.c io.c movegen.c validate.c makemove.c perft.c -o vice
