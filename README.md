@@ -1,10 +1,23 @@
 # TODO
 
+- https://www.youtube.com/watch?v=hDHa4-fijMc&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=61
+
 - Add verbose flag, with debug print, with verbose flag check in the debug print
 
 - Web GUI: http://talkchess.com/forum3/viewtopic.php?t=75352
 
+- register bot on Lichess https://lichess.org/api#operation/botAccountUpgrade
 
+- use this guys bridge: https://github.com/ana-ka/lichess-uci-bot or this? https://github.com/ShailChoksi/lichess-bot
+
+
+
+# Teri - A simple Chess Engine, with web server!
+
+Uses a [Alpha Beta](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning) Search Implementation to score moves.
+No libraries outside of C stdlib is used for the Engine code.
+
+Web server uses chessjs and some other useful stuff.
 
 # Board Representation
 
@@ -18,7 +31,7 @@ a-h on the x axis.
 
 Instead of representing the board as an 8x8 board, we need to know if the piece has run off the board or not.
 
-So we make our array with a set of border squares, with set value like `OFF_BOARD` so we know its invalid square.
+So we make our array with a set of border squares, with set value like `OFFBOARD` so we know its invalid square.
 
 The board is a 10x12, as we need to account for knights moving 2 squares deep off-board. We dont need extra rows on the sides of the array as it will loop around to an invalid square on the next row, on the other side of the board.
 
@@ -37,6 +50,7 @@ So, the board starts at tile 21, with each row having invalid squares at *x*0 an
 **Side to Move** - Track which side to move.
 
 **Ply** - Amount of half moves made in a game (if one side has made a move, that is one ply. If two sides have a made a move (counted as a *move*) then we are two plys deep.) (need to track this value aswell).
+
 
 
 

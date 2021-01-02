@@ -3,10 +3,11 @@
 
 #include "stdlib.h"
 
-//#define DEBUG
+#define DEBUG 1
 
 #ifndef DEBUG
 #define ASSERT(n)
+#define dbg_print(fmt, ...)
 #else
 #define ASSERT(n) \
 if(!(n)) { \
@@ -16,6 +17,9 @@ printf("At %s ",__TIME__); \
 printf("In File %s ",__FILE__); \
 printf("At Line %d\n",__LINE__); \
 exit(1);}
+// funky debug print yoinked from stack overflow
+#define dbg_print(fmt, ...) \
+            do { if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 #endif
 
 typedef unsigned long long U64;
@@ -29,6 +33,10 @@ typedef unsigned long long U64;
 #define MAXGAMEMOVES 2048
 // Max number of moves we would expect in a given position.
 #define MAXPOSITIONMOVES 256
+
+#define MAXDEPTH 64
+
+#define START_FEN  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 // The first part is the description of pieces on the board
 // with numbers being the number of consecutive empty pieces in a row
@@ -72,6 +80,16 @@ typedef struct {
 	S_MOVE moves[MAXPOSITIONMOVES];
 	int count;
 } S_MOVELIST;
+
+typedef struct {
+	U64 posKey;
+	int move;
+} S_PVENTRY;
+
+typedef struct {
+	S_PVENTRY *pTable;
+	int numEntries;
+} S_PVTABLE;
 
 // Information needed to undo a move
 typedef struct {
@@ -147,10 +165,42 @@ typedef struct {
 
 	// If we wanted to put the first White Knight on E1, we would do:
 	// pieceList[wN][0] = E1;
+	//
+	S_PVTABLE PvTable[1];
 
-	
+	int PvArray[MAXDEPTH];	
+
+	int searchHistory[13][BRD_SQ_NUM];
+
+	// Used to set the scores inside the move generator.
+	int searchKillers[2][MAXDEPTH];
 
 } S_BOARD;
+
+
+// S_SEARCHINFO provides information about the search.
+typedef struct {
+	int starttime;
+	int stoptime;
+	int depth;
+	int depthset;
+	int timeset;
+
+	int movestogo;
+	int infinite;
+
+	long nodes;
+
+	// If the GUI sends a quit during the seach, we set this variable and handle the quit gracefully with cleanup etc.
+	int quit;
+	// If stop is sent, stopped will be set to TRUE and we will recursively back out of the search without updating scores or anything.
+	// restoring previous values from previous iteration.
+	int stopped;
+
+	float fh;
+	float fhf;
+
+} S_SEARCHINFO;
 
 /* GAME MOVE */
 
@@ -174,6 +224,7 @@ typedef struct {
  *                 To Square
  *
  * The next least significant 7 bits store the 'To' Square
+const int PvSize = 0x200000;
  *
  * To Get: >> 7, 0x7F
  *                
@@ -236,6 +287,11 @@ typedef struct {
 
 #define MFLAGCAP 0x7C000
 #define MFLAGPROM 0xF00000
+
+#define NOMOVE 0
+
+#define INFINITE 30000
+#define MATE 29000
 
 
 /* MACROS */
@@ -310,7 +366,7 @@ extern int SqAttacked(const int sq, const int side, const S_BOARD *pos);
 extern char *PrMove(const int move);
 extern char *PrSq(const int sq);
 extern void PrintMoveList(const S_MOVELIST *list);
-
+extern int ParseMove(char *move_str, S_BOARD *pos);
 //validate.c
 extern int SqOnBoard(const int sq);
 extern int SideValid(const int side);
@@ -320,6 +376,7 @@ extern int PieceValid(const int pce);
 
 // movegen.c
 extern void GenerateAllMoves(const S_BOARD *pos, S_MOVELIST *list);
+extern int MoveExists(S_BOARD *pos, const int move);
 
 // makemove.c
 extern int MakeMove(S_BOARD *pos, int move);
@@ -327,6 +384,23 @@ extern void TakeMove(S_BOARD *pos);
 
 // perft.c 
 extern void PerftTest(int depth, S_BOARD *pos);
+
+// search.c
+extern void SearchPosition(S_BOARD *pos, S_SEARCHINFO *info);
+
+// misc.c
+extern int GetTimeMs();
+
+// pvtable.c
+extern void ClearPvTable();
+extern void InitPvTable();
+extern int ProbePvTable(const S_BOARD *pos);
+extern void StorePvMove(const S_BOARD *pos, const int move);
+extern int GetPvLine(const int depth, S_BOARD *pos);
+
+// evaluate.c
+int EvalPosition(const S_BOARD *pos);
+
 #endif
 
 

@@ -212,10 +212,7 @@ int MakeMove(S_BOARD *pos, int move) {
             HASH_EP;
         }
     }
-	if(GeneratePosKey(pos) == 0xf62d401ab74ef458) {
-        ASSERT(FALSE);
-    }
-        
+	
 	MovePiece(from, to, pos);
 	
 	int prPce = PROMOTED(move);
@@ -236,9 +233,9 @@ int MakeMove(S_BOARD *pos, int move) {
 	
 		
 	if(SqAttacked(pos->KingSq[side],pos->side,pos))  {
-		TakeMove(pos);
-		return FALSE;
-    	}
+        TakeMove(pos);
+        return FALSE;
+    }
 	
 	return TRUE;
 	
