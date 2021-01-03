@@ -2,15 +2,17 @@
 
 #include "stdio.h"
 #include "defs.h"
-#include "string.h"
 
 #ifdef WIN32
 #include "windows.h"
 #else
-#include <sys/time.h>
+#include "sys/time.h"
+#include "sys/select.h"
+#include "unistd.h"
+#include "string.h"
 #endif
 
-int GetTimeMs() { 
+int GetTimeMs() {
 #ifdef WIN32
   return GetTickCount();
 #else
@@ -19,6 +21,7 @@ int GetTimeMs() {
   return t.tv_sec*1000 + t.tv_usec/1000;
 #endif
 }
+
 
 // http://home.arcor.de/dreamlike/chess/
 int InputWaiting()
@@ -60,7 +63,7 @@ void ReadInput(S_SEARCHINFO *info) {
   int             bytes;
   char            input[256] = "", *endc;
 
-    if (InputWaiting()) {    
+    if (InputWaiting()) {
 		info->stopped = TRUE;
 		do {
 		  bytes=read(fileno(stdin),input,256);
