@@ -202,7 +202,7 @@ int MakeMove(S_BOARD *pos, int move) {
 	if(PiecePawn[pos->pieces[from]]) {
         pos->fiftyMove = 0;
         if(move & MFLAGPS) {
-            if(side==WHITE) {
+            if(side == WHITE) {
                 pos->enPas=from+10;
                 ASSERT(RanksBrd[pos->enPas]==RANK_3);
             } else {

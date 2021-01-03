@@ -10,8 +10,6 @@ char *PrSq(const int sq) {
 	int file = FilesBrd[sq];
 	int rank = RanksBrd[sq];
 	
-	
-	
 	sprintf(SqStr, "%c%c", ('a'+file), ('1'+rank));
 	
 	return SqStr;

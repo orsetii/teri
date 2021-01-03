@@ -10,6 +10,33 @@ static void CheckUp() {
 	// .. check if time up, or interrupt from GUI
 }
 
+
+static void PickNextMove(int moveNum, S_MOVELIST *list) {
+
+
+	S_MOVE temp;
+
+	int bestScore = 0;
+	int bestNum = moveNum;
+
+	for (int i = 0; i < list->count; ++i) {
+		if (list->moves[i].score > bestScore) {
+			bestScore = list->moves[i].score;
+			bestNum = i;
+		}
+	}
+
+	temp = list->moves[moveNum];
+	list->moves[moveNum] = list->moves[bestNum];
+	list->moves[bestNum] = temp;
+
+
+
+
+
+}
+
+
 static int IsRepetition(const S_BOARD *pos) {
 
 	int index = 0;
@@ -51,6 +78,17 @@ static void ClearForSearch(S_BOARD *pos, S_SEARCHINFO *info) {
 }
 
 static int Quiescence(int alpha, int beta, S_BOARD *pos, S_SEARCHINFO *info) {
+
+
+	ASSERT(CheckBoard(pos));
+
+	info->nodes++;
+
+	if (IsRepetition(pos) || pos->fiftyMove >= 100) {
+		return 0;
+	}
+
+
 	return 0;
 }
 
@@ -74,36 +112,66 @@ static int AlphaBeta(int alpha, int beta, int depth, S_BOARD *pos, S_SEARCHINFO 
 	}
 	
 	S_MOVELIST list[1];
-    GenerateAllMoves(pos,list);
+        GenerateAllMoves(pos,list);
       
-    int MoveNum = 0;
+        int MoveNum = 0;
 	int Legal = 0;
 	int OldAlpha = alpha;
 	int BestMove = NOMOVE;
 	int Score = -INFINITE;
 	
-	for(MoveNum = 0; MoveNum < list->count; ++MoveNum) {	
-       
-        if ( !MakeMove(pos,list->moves[MoveNum].move))  {
-            continue;
-        }
-        
-		Legal++;
-		Score = -AlphaBeta( -beta, -alpha, depth-1, pos, info, TRUE);		
-        TakeMove(pos);
-		
-		if(Score > alpha) {
-			if(Score >= beta) {
-				if(Legal==1) {
-					info->fhf++;
-				}
-				info->fh++;				
-				return beta;
+	// probe principal variation table for a move at the current position, 
+	// if we have a move we are in the main line
+	int PvMove = ProbePvTable(pos);
+
+	if (PvMove != NOMOVE) {
+		for(MoveNum = 0; MoveNum < list->count; ++MoveNum) {	
+			if (list->moves[MoveNum].move == PvMove) {
+				list->moves[MoveNum].score = 2000000;
+				break;
 			}
-			alpha = Score;
-			BestMove = list->moves[MoveNum].move;
-		}		
-    }
+
+		}
+	}
+
+
+	
+	for(MoveNum = 0; MoveNum < list->count; ++MoveNum) {	
+
+		PickNextMove(MoveNum, list);
+       
+		if ( !MakeMove(pos,list->moves[MoveNum].move))  {
+		    continue;
+		}
+		
+			Legal++;
+			Score = -AlphaBeta( -beta, -alpha, depth-1, pos, info, TRUE);		
+		TakeMove(pos);
+			
+			if(Score > alpha) {
+				if(Score >= beta) {
+					if(Legal==1) {
+						info->fhf++;
+					}
+					info->fh++;				
+
+					// check for killer moves, aka moves that cause a beta cutoff
+					// but are not a capture
+					
+					if( !(list->moves[MoveNum].move & MFLAGCAP)) {
+						pos->searchKillers[1][pos->ply] = pos->searchKillers[0][pos->ply];
+						pos->searchKillers[0][pos->ply] = list->moves[MoveNum].move;
+ 
+					}
+					return beta;
+				}
+				alpha = Score;
+				BestMove = list->moves[MoveNum].move;
+				if( !(list->moves[MoveNum].move & MFLAGCAP)) {
+					pos->searchHistory[pos->pieces[FROMSQ(BestMove)]][TOSQ(BestMove)] += depth;
+				}
+			}		
+	    }
 	
 	if(Legal == 0) {
 		if(SqAttacked(pos->KingSq[pos->side],pos->side^1,pos)) {
