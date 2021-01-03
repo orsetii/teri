@@ -309,6 +309,9 @@ const int PvSize = 0x200000;
 #define IsKn(p) (PieceKnight[(p)])
 #define IsKi(p) (PieceKing[(p)])
 
+#define MIRROR64(sq) (Mirror64[(sq)])
+
+
 /* GLOBALS */
 
 extern int Sq120ToSq64[BRD_SQ_NUM];
@@ -338,6 +341,8 @@ extern int PieceKing[13];
 extern int PieceRookQueen[13];
 extern int PieceBishopQueen[13];
 extern int PieceSlides[13];
+
+extern int Mirror64[64];
 
 /* FUNCTIONS */
 
@@ -378,6 +383,7 @@ extern int PieceValid(const int pce);
 extern void GenerateAllMoves(const S_BOARD *pos, S_MOVELIST *list);
 extern int MoveExists(S_BOARD *pos, const int move);
 extern void InitMvvLva();
+void GenerateAllCaps(const S_BOARD *pos, S_MOVELIST *list);
 
 // makemove.c
 extern int MakeMove(S_BOARD *pos, int move);
@@ -391,6 +397,7 @@ extern void SearchPosition(S_BOARD *pos, S_SEARCHINFO *info);
 
 // misc.c
 extern int GetTimeMs();
+extern void ReadInput(S_SEARCHINFO *info);
 
 // pvtable.c
 extern void ClearPvTable();
@@ -402,6 +409,11 @@ extern int GetPvLine(const int depth, S_BOARD *pos);
 // evaluate.c
 int EvalPosition(const S_BOARD *pos);
 
+// uci.c
+extern void ParseGo(char* line, S_SEARCHINFO *info, S_BOARD *pos);
+extern void ParsePosition(char* lineIn, S_BOARD *pos);
+
+extern void UCI_Loop();
 #endif
 
 
