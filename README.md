@@ -1,17 +1,3 @@
-# TODO
-
-- https://www.youtube.com/watch?v=hDHa4-fijMc&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=61
-
-- Add verbose flag, with debug print, with verbose flag check in the debug print
-
-- Web GUI: http://talkchess.com/forum3/viewtopic.php?t=75352
-
-- register bot on Lichess https://lichess.org/api#operation/botAccountUpgrade
-
-- use this guys bridge: https://github.com/ana-ka/lichess-uci-bot or this? https://github.com/ShailChoksi/lichess-bot
-
-
-
 # Teri - A simple Chess Engine, with web server!
 
 Uses a [Alpha Beta](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning) Search Implementation to score moves.
